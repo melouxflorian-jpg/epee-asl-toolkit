@@ -75,7 +75,7 @@ horizontal signing space**, and gloss orders that differ between signers — `YO
 This is the variance a model trained on one signer never sees, and it is why single-signer sign
 language datasets do not transfer.
 
-![signer variability](docs/signer_variability.png)
+![cross-signer benchmark](https://huggingface.co/datasets/CLERC-DATA/epee/resolve/main/benchmark.png)
 
 ---
 
