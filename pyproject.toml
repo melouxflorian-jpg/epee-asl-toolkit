@@ -1,0 +1,19 @@
+[project]
+name = "epee-asl-toolkit"
+version = "0.1.0"
+description = "Toolkit for the CLERC Epee American Sign Language keypoint corpus"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Florian Meloux", email = "florian@clerc.io" }]
+keywords = ["sign-language", "asl", "american-sign-language", "dataset",
+            "keypoints", "mediapipe", "pose-estimation", "slr", "deaf",
+            "multimodal", "accessibility"]
+dependencies = ["numpy>=1.24", "pandas>=2.0", "matplotlib>=3.7", "huggingface_hub>=0.24"]
+
+[project.urls]
+Homepage = "https://clerc.io"
+Dataset = "https://huggingface.co/datasets/CLERC-DATA/epee"
+
+[tool.setuptools.packages.find]
+include = ["epee*"]
