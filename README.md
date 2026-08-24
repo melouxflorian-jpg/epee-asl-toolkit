@@ -6,6 +6,7 @@
 [![Code License](https://img.shields.io/badge/Code-MIT-green?style=flat-square)](LICENSE)
 [![Data License](https://img.shields.io/badge/Data-CC%20BY--NC--SA%204.0-blue?style=flat-square)](https://huggingface.co/datasets/CLERC-DATA/epee)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square)](https://www.python.org/)
+[![DOI](https://img.shields.io/badge/DOI-10.5281%2Fzenodo.22081248-1682D4?style=flat-square)](https://doi.org/10.5281/zenodo.22081248)
 
 Épée is an open, AI-grade ASL corpus: **1,200 clips, 71 minutes of signing, 6 native Deaf signers**,
 released as MediaPipe keypoints with expert gloss segmentation. Five of the six signers cover a
@@ -159,6 +160,7 @@ licensing and access to the full multi-signer corpus: **[florian@clerc.io](mailt
   title  = {CLERC Épée v0.3: A Multi-Signer ASL Keypoint Corpus},
   author = {Meloux, Florian},
   year   = {2026},
+  doi    = {10.5281/zenodo.22081248},
   url    = {https://huggingface.co/datasets/CLERC-DATA/epee}
 }
 ```
