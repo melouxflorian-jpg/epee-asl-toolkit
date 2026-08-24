@@ -23,7 +23,11 @@ LOWER_BODY = slice(54, 64)
 EYES_MOUTH = slice(64, 92)
 HEAD_OVAL = slice(92, 128)
 
-SIGNERS = ("ALPHA", "BRAVO", "CHARLIE", "DELTA")
+# All six signers in the release. GRID_SIGNERS are the five on the parallel
+# grid; FOXTROT was recorded on a disjoint prompt set (a second, declarative
+# register) so he has no rendering of the grid phrases.
+SIGNERS = ("ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO", "FOXTROT")
+GRID_SIGNERS = ("ALPHA", "BRAVO", "CHARLIE", "DELTA", "ECHO")
 
 
 @dataclass
@@ -37,6 +41,8 @@ class Clip:
     n_frames: int
     segments: list[dict]
     keypoints: np.ndarray = field(repr=False)
+    phrase_id: int | None = None
+    parallel: bool = True
 
     @property
     def duration_s(self) -> float:
@@ -86,7 +92,7 @@ def _fetch(filename: str) -> Path:
 
 
 def download_all() -> Path:
-    """Fetch the whole dataset at once (~1200 files). Returns the local root.
+    """Fetch the whole dataset at once (~2400 files). Returns the local root.
 
     Only needed for full-corpus work; load_clip() fetches lazily per clip.
     """
@@ -103,7 +109,7 @@ def load_metadata():
 
 
 def load_clip(clip_id: str) -> Clip:
-    """Load a single clip by id, e.g. 'clerc_v02_001'."""
+    """Load a single clip by id, e.g. 'clerc_v03_0001'."""
     with open(_fetch(f"annotations/{clip_id}.json")) as fh:
         ann = json.load(fh)
     kp = np.load(_fetch(f"keypoints/{clip_id}.npy"))
@@ -115,6 +121,8 @@ def load_clip(clip_id: str) -> Clip:
         n_frames=int(ann["n_frames"]),
         segments=ann["segments"],
         keypoints=kp,
+        phrase_id=ann.get("phrase_id"),
+        parallel=bool(ann.get("parallel", True)),
     )
 
 
@@ -128,18 +136,41 @@ def load_clips(signer: str | None = None, limit: int | None = None) -> list[Clip
     return [load_clip(cid) for cid in meta.clip_id]
 
 
-def parallel_group(phrase_index: int) -> list[Clip]:
-    """The same phrase signed by all four signers.
+def parallel_group(phrase_id: int) -> list[Clip]:
+    """Every rendering of one phrase, one clip per signer on the parallel grid.
 
-    The corpus is fully parallel: clips 001, 151, 301 and 451 are the four
-    signers' renderings of phrase #1. This is the entry point for
-    inter-signer variability analysis.
+    Pairing goes through the ``phrase_id`` column of ``metadata.csv``, not
+    through arithmetic on clip ids. Block offsets change between releases and
+    the grid is not perfectly rectangular, so arithmetic silently returns the
+    wrong clips; the column does not.
 
-    phrase_index is 1-based, 1..150.
+    Returns clips ordered by signer. Most phrases come back with five, a few
+    with four: see ``grid_coverage()``.
     """
-    if not 1 <= phrase_index <= 150:
-        raise ValueError("phrase_index must be in 1..150")
-    return [load_clip(f"clerc_v02_{phrase_index + 150 * b:03d}") for b in range(4)]
+    meta = load_metadata()
+    rows = meta[(meta.parallel == "yes") & (meta.phrase_id == phrase_id)]
+    if rows.empty:
+        raise ValueError(
+            f"no parallel-grid phrase with phrase_id={phrase_id}; "
+            f"valid ids: {sorted(meta[meta.parallel == 'yes'].phrase_id.unique())[:5]}..."
+        )
+    rows = rows.sort_values("signer_id")
+    return [load_clip(cid) for cid in rows.clip_id]
+
+
+def grid_coverage():
+    """How many signers rendered each grid phrase, as a DataFrame.
+
+    The grid is near-rectangular, not rectangular: one legacy phrase is missing
+    a signer, and one was recorded by a single signer. Check coverage before
+    assuming a fixed group size.
+    """
+    meta = load_metadata()
+    grid = meta[meta.parallel == "yes"]
+    return (grid.groupby("phrase_id")
+                .agg(n_signers=("signer_id", "nunique"),
+                     text_en=("text_en", "first"))
+                .reset_index())
 
 
 def normalize_by_shoulders(kp: np.ndarray) -> np.ndarray:

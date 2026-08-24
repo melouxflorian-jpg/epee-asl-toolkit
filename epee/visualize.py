@@ -99,7 +99,7 @@ def plot_signer_comparison(clips: list[Clip], at: float = 0.5, path: str = "sign
         draw_frame(ax, kp[i], color=color, label=clip.signer_id)
         ax.set_xlim(-2.2, 2.2)
         ax.set_ylim(2.9, -2.4)
-    fig.suptitle(f"“{clips[0].text_en}” — same phrase, {len(clips)} Deaf signers", fontsize=11)
+    fig.suptitle(f"“{clips[0].text_en}” - same phrase, {len(clips)} Deaf signers", fontsize=11)
     fig.tight_layout()
     fig.savefig(path, dpi=140, bbox_inches="tight")
     plt.close(fig)
