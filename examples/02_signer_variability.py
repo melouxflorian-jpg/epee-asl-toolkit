@@ -1,8 +1,8 @@
-"""Inter-signer variability — the thing this corpus exists to measure.
+"""Inter-signer variability - the thing this corpus exists to measure.
 
-Épée is fully parallel: every one of 150 phrases is signed by all four Deaf
-signers. That structure lets you isolate signer variation from phrase variation,
-which single-signer datasets cannot do.
+Five of the six Deaf signers sign a shared grid of 201 phrases. That structure
+lets you isolate signer variation from phrase variation, which single-signer
+datasets cannot do. Clips are paired through ``phrase_id``.
 
     python examples/02_signer_variability.py
 """
@@ -15,7 +15,7 @@ from epee.visualize import plot_signer_comparison
 PHRASE = 7
 
 clips = epee.parallel_group(PHRASE)
-print(f"Phrase #{PHRASE}: “{clips[0].text_en}”\n")
+print(f"Phrase #{PHRASE}: “{clips[0].text_en}” - {len(clips)} signers\n")
 
 for c in clips:
     print(f"  {c.signer_id:<8} {c.duration_s:5.2f}s  "
@@ -36,4 +36,4 @@ for c in clips:
 out = plot_signer_comparison(clips, at=0.5, path="signer_variability.png")
 print(f"\nWrote {out}")
 print("\nThis is why single-signer training does not transfer: the same phrase,")
-print("signed by four native signers, produces four measurably different sequences.")
+print(f"signed by {len(clips)} native signers, produces {len(clips)} measurably different sequences.")
